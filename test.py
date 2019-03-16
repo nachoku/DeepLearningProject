@@ -1,19 +1,13 @@
 import os
-from sklearn.metrics import confusion_matrix
-import pandas as pd
-import predict
 
 import argparse
 import torch
-from torchvision import models
 from torch.autograd import Variable
-import torch.nn.functional as F
-import json
+
 from torchvision import datasets, models, transforms
 from PIL import Image
 import numpy as np
-from network_prep import load_model
-from processimage import process_image
+
 from torch import nn
 label_dict={
  1:'isolation',
@@ -48,9 +42,9 @@ def get_input_args():
     return parser.parse_args()
 
 
-class AlexNet(nn.Module):
+class CNN(nn.Module):
     def __init__(self):
-        super(AlexNet, self).__init__()
+        super(CNN, self).__init__()
 
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
@@ -88,14 +82,11 @@ class AlexNet(nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = AlexNet().to(device)
+model = CNN().to(device)
 
 
-SAVE_DIR = 'models'
-MODEL_SAVE_PATH = 'base.pt'
 # print(model)
-model.load_state_dict(torch.load(MODEL_SAVE_PATH))
-model.classifier[6].out_features=9
+model.load_state_dict(base.pt)
 
 
 # print(get_input_args())
