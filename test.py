@@ -19,9 +19,9 @@ label_dict={
  1:'isolation',
  4:'punching',
  8:'strangle',
- 6:'gossiping',
+ 0:'gossiping',
  7:'stabbing',
- 0:'slapping',
+ 6:'slapping',
  2:'laughing',
  3:'pullinghair',
  5:'quarrel'
@@ -92,57 +92,23 @@ model = AlexNet().to(device)
 
 
 SAVE_DIR = 'models'
-MODEL_SAVE_PATH = os.path.join(SAVE_DIR, 'alexnet-bullying.pt')
-print(model)
+MODEL_SAVE_PATH = os.path.join(SAVE_DIR, 'base.pt')
+# print(model)
 model.load_state_dict(torch.load(MODEL_SAVE_PATH))
 model.classifier[6].out_features=9
-total=0
-correct=0
-labels_true=[]
-labels_pred=[]
-directory='data/test'
-for filename in os.listdir(directory):
-    if (filename == ".*"):
-        continue
-    path = os.path.join(directory, filename)
-    print(path)
 
 
-    for imagefile in os.listdir(path):
+# print(get_input_args())
+image = image_loader(get_input_args().imageFile)
 
-        print(os.path.join(path, imagefile))
-        total+=1
-        try:
-            # image = process_image(os.path.join(path, imagefile))
-            image = image_loader(os.path.join(path, imagefile))
-        except:
-            continue
-        # image = image.unsqueeze(0).float()
-        # image = Variable(image)
-        # if torch.cuda.is_available():
-        #     model.cuda()
-        #     image = image.cuda()
-        #     print('GPU PROCESSING')
-        # else:
-        #     print('CPU PROCESSING')
-        with torch.no_grad():
-            out = (model.forward(image))
-            result = torch.exp(out).cpu().data.topk(1)  # MODIFIED
-            print(result)
-        classes = np.array(result[1][0], dtype=np.int)
-        result=label_dict[classes[0]]
-        # print(result)
-        if(result==filename):
-            correct+=1
-            print('Correct')
-        labels_true.append(filename)
-        labels_pred.append(result)
+with torch.no_grad():
+    out = (model.forward(image))
+    result = torch.exp(out).cpu().data.topk(1)  # MODIFIED
+    # print(result)
+classes = np.array(result[1][0], dtype=np.int)
+result=label_dict[classes[0]]
+print(result)
+
+# print('result')
 
 
-labels=os.listdir(directory)
-
-matrix= confusion_matrix(labels_true, labels_pred, labels=labels, sample_weight=None)
-matrix_labelled=pd.DataFrame(matrix, index=['true:{:}'.format(x) for x in labels], columns=['pred:{:}'.format(x) for x in labels])
-print(matrix_labelled)
-print('Accuracy: '+str(correct/total))
-matrix_labelled.to_csv('confusion_matrix_.csv')
