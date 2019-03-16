@@ -92,7 +92,7 @@ model = AlexNet().to(device)
 
 
 SAVE_DIR = 'models'
-MODEL_SAVE_PATH = os.path.join(SAVE_DIR, 'base.pt')
+MODEL_SAVE_PATH = 'base.pt'
 # print(model)
 model.load_state_dict(torch.load(MODEL_SAVE_PATH))
 model.classifier[6].out_features=9
